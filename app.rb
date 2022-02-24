@@ -5,12 +5,12 @@ class App
   def call(env)
     @env = env
     @format = Rack::Utils.parse_query(env['QUERY_STRING'])['format']
-    responce
+    response
   end
 
   private
 
-  def responce
+  def response
     if @env['REQUEST_METHOD'] != 'GET'
       return [405, {}, ["Wrong request method\n"]]
     end
