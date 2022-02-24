@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class TimeFormat
-  DATE_FORMATS = { 'year' => '%Y', 'month' => '%m', 'day' => '%d' }.freeze
-  TIME_FORMATS = { 'hour' => '%H', 'minute' => '%M', 'second' => '%S' }.freeze
+  DATE_FORMATS = { 'year' => '%Y', 'month' => '%m', 'day' => '%d' }
+  TIME_FORMATS = { 'hour' => '%H', 'minute' => '%M', 'second' => '%S' }
 
   def initialize(format)
     @foramt = format.split(',')
