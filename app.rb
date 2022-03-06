@@ -13,7 +13,7 @@ class App
 
   def operate_request(request)
     params_string = request.params['format']
-    @date_format = DateFormat.new(params_string)
+    @date_format = TimeFormat.new(params_string)
     @date_format.check_format
     @date_format.success? ? response_success : response_unknown_formats
   end
