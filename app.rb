@@ -5,28 +5,38 @@ require_relative 'time_format'
 
 class App
   def call(env)
-    @env = env
-    @format = Rack::Utils.parse_query(env['QUERY_STRING'])['format']
-    response
+    request = Rack::Request.new(env)
+    request_valid?(request) ? operate_request(request) : response_bad_request
   end
 
   private
 
-  def response
-    if @env['REQUEST_METHOD'] != 'GET'
-      return [405, {}, ["Wrong request method\n"]]
-    end
+  def operate_request(request)
+    params_string = request.params['format']
+    @date_format = DateFormat.new(params_string)
+    @date_format.check_format
+    @date_format.success? ? response_success : response_unknown_formats
+  end
 
-    if format.nil?
-      return [400, {}, ["Format parameter can't be nil\n"]]
-    end
+  def request_valid?(request)
+    request.get?
+    request.path == '/time'
+    request.params['format']
+  end
 
-    time_format = TimeFormat.new(@format)
-    
-    if !time_format.valid?
-      return [400, {}, ["Unknown time format #{time_format.unknown_format}\n"]]
-    end
+  def response(status, body)
+    Rack::Response.new(body, status, {'Content-Type' => 'text/plain'}).finish
+  end
 
-    [200, {}, ["#{time_format.time}\n"]]
+  def response_bad_request
+    response(404, 'not found')
+  end
+
+  def response_success
+    response(200, @date_format.convert_format)
+  end
+
+  def response_unknown_formats
+    response(400,"unknown time format #{@date_format.rejected_params}")
   end
 end

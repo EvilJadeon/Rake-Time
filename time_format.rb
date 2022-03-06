@@ -1,25 +1,37 @@
 # frozen_string_literal: true
 
 class TimeFormat
-  DATE_FORMATS = { 'year' => '%Y', 'month' => '%m', 'day' => '%d' }
-  TIME_FORMATS = { 'hour' => '%H', 'minute' => '%M', 'second' => '%S' }
 
-  def initialize(format)
-    @foramt = format.split(',')
+  FORMATS = { year:   '%Y',
+    month:  '%m',
+    day:    '%d',
+    hour:   '%H',
+    minute: '%M',
+    second: '%S'
+  }
+
+  def initialize(params_string)
+    @params_string = params_string
+    @accepted_params = []
+    @rejected_params = []
   end
 
-  def valid?
-    unknown_format.empty?
+  def success?
+    @rejected_params.empty?
   end
 
-  def unknown_format
-    @format.difference(DATE_FORMATS.keys + TIME_FORMATS.keys)
+  def convert_format
+    Time.now.strftime(@accepted_params.join('-'))
   end
 
-  def time
-    date_format = @format.map { |element| DATE_FORMATS[element] }.compact.join('-')
-    time_format = @format.map { |element| TIME_FORMATS[element] }.compact.join(':')
-
-    Time.now.strftime("#{date_format} #{time_format}")
+  def check_format
+    params = @params_string.split(',')
+    params.each do |param|
+      if FORMATS.key?(param.to_sym)
+        @accepted_params << FORMATS[param.to_sym]
+      else
+        @rejected_params << param
+      end
+    end
   end
 end
